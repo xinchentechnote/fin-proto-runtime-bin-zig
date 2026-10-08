@@ -1,0 +1,13 @@
+.{
+    .name = .binary_codec,
+    .version = "0.1.0",
+    .fingerprint = 0x4476a262326cad01, // Derived from the package name by zig; do not copy between packages.
+    .minimum_zig_version = "0.17.0",
+    .dependencies = .{},
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+        "examples",
+    },
+}
