@@ -43,6 +43,12 @@ pub const Buffer = struct {
         self.len = 0;
     }
 
+    /// Reset the buffer for another encode round, keeping the allocated
+    /// capacity (the streaming-write / benchmark idiom).
+    pub fn reset(self: *Buffer) void {
+        self.len = 0;
+    }
+
     /// The bytes written so far.
     pub fn written(self: *const Buffer) []const u8 {
         return self.data[0..self.len];
@@ -327,6 +333,16 @@ test "patch rewrites scalar in place" {
     try buf.patch(u16, 0, 7);
     try testing.expectEqualSlices(u8, &.{ 0, 7, 0, 0, 0, 99 }, buf.written());
     try testing.expectError(error.UnexpectedEof, buf.patch(u32, 3, 1));
+}
+
+test "reset keeps capacity and truncates" {
+    var buf = Buffer.init(testing.allocator, .big);
+    defer buf.deinit();
+    try buf.writeBytes(&.{ 1, 2, 3, 4 });
+    buf.reset();
+    try testing.expectEqual(@as(usize, 0), buf.len);
+    try buf.put(u32, 0x01020304);
+    try testing.expectEqualSlices(u8, &.{ 1, 2, 3, 4 }, buf.written());
 }
 
 test "char array pad and trim" {
